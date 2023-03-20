@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+</body>
+</html>
+
+<script>
+    const point2d = function(x,y){
+        this.x = x
+        this.y = y
+    }
+    const point3d = function(x,y,z){
+        this.x = x
+        this.y = y 
+        this.z = z
+    }
+    
+    const cube = function(x,y,z,size) {
+        size *=0.5
+        point3d.call(this, x,y,z)
+        this.vertecis = [new point3d(x - size, y - size, z - size),
+                         new point3d(x + size, y - size, z - size),
+                         new point3d(x + size, y + size, z - size),
+                         new point3d(x - size, y + size, z - size),
+                         new point3d(x - size, y - size, z + size),
+                         new point3d(x + size, y - size, z + size),
+                         new point3d(x + size, y + size, z + size),
+                         new point3d(x - size, y + size, z + size)]
+    }
+
+    cube.prototype = {
+        rotateX:function(radian){
+            var sin = Math.sin(radian)
+            var cos = Math.cos(radian)
+
+            var p = this.vertecis
+            for(let i = this.vertecis.length - 1; i > -1; --i){
+            let p = this.vertecis[i];
+
+            let x = (p.z - this.z) * sin + (p.x - this.x) * cos;
+            let z = (p.z - this.z) * cos - (p.x - this.x) * sin;
+
+            p.x = x + this.x;
+            p.z = z + this.z;
+            }
+        },
+        rotateY:function(radian){
+            var sin = Math.sin(radian)
+            var cos = Math.cos(radian)
+
+            var p = this.vertecis
+            for(let i = this.vertecis.length - 1; i > -1; --i){
+            let p = this.vertecis[i];
+
+            let y = (p.z - this.z) * sin + (p.y - this.y) * cos;
+            let z = (p.z - this.z) * cos - (p.y - this.y) * sin;
+
+            p.y = y + this.y;
+            p.z = z + this.z;
+            }
+        }
+
+    }
+    var context = document.querySelector("canvas").getContext("2d")
+    var Cube = new cube(0,0,400,200)
+    // console.log(Cube.vertecis)
+    
+    // context.strokeStyle = "#000000"
+    // context.fillStyle = "#ffffff"
+    // context.fillRect(0, 0, width, height);
+    context.font = "10px Arial"
+    var width = document.documentElement.clientWidth
+    var height = document.documentElement.clientHeight
+
+    context.canvas.height = height
+    context.canvas.width = width
+    
+    function projected(points3d,width,height){
+
+        var points2d = new Array(points3d.length)
+        var FocalLenght = 300
+        for(let index = points3d.length - 1; index> -1; --index){
+
+            let p = points3d[index]
+
+            let x = p.x * (FocalLenght / p.z) + width * 0.5
+            let y = p.y * (FocalLenght / p.z) + height * 0.5
+            
+            points2d[index] = new point2d(x,y)
+        }
+        return points2d
+    }
+    
+
+
+    // for(let i = vert.length-1;i>-1;--i){
+    //     console.log('ok')
+    // }
+    function loop(){
+        window.requestAnimationFrame(loop)
+
+        context.clearRect(0,0,width,height);
+
+        // context.beginPath();
+        //     context.moveTo(width * 0.5 - 200, height * 0.5);
+        //     context.lineTo(width * 0.5 + 200, height * 0.5);
+        //     context.closePath();
+        //     context.fill();
+        //     context.stroke();
+        let vert = projected(Cube.vertecis,width,height)
+        Cube.rotateX(0.01)
+        Cube.rotateY(-0.01)
+
+        context.fillText("JavaScript",vert[0].x,vert[0].y)
+        context.fillText("Css",vert[1].x,vert[1].y)
+        context.fillText("HTML",vert[2].x,vert[2].y)
+        context.fillText("Code Igniter",vert[3].x,vert[3].y)
+        context.fillText("Laravel",vert[4].x,vert[4].y)
+        context.fillText("React JS",vert[5].x,vert[5].y)
+        context.fillText("WorldPress",vert[6].x,vert[6].y)
+        context.fillText("Bootsraps",vert[7].x,vert[7].y)
+        context.beginPath()
+        context
+        context.lineTo(vert[0].x,vert[0].y)
+    }
+
+    
+    loop()
+
+</script>
